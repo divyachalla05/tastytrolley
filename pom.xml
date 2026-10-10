@@ -12,11 +12,11 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.quickbite</groupId>
-    <artifactId>quickbite</artifactId>
+    <groupId>com.tastytrolley</groupId>
+    <artifactId>tastytrolley</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>QuickBite</name>
-    <description>QuickBite food ordering API for DevOps practice</description>
+    <name>TastyTrolley</name>
+    <description>TastyTrolley food ordering API for DevOps practice</description>
 
     <properties>
         <java.version>17</java.version>
