@@ -1,0 +1,371 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TastyTrolley | Good Food, Happy Mood</title>
+<style>
+:root {
+  --orange: #f36b35;
+  --dark: #242424;
+  --muted: #777;
+  --cream: #fff9f4;
+  --green: #218653;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  color: var(--dark);
+  background: #fff;
+}
+header {
+  padding: 18px 7%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  border-bottom: 1px solid #eee;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: white;
+}
+.logo { font-size: 25px; font-weight: 800; }
+.logo span { color: var(--orange); }
+.cart-button, .primary {
+  border: 0;
+  background: var(--orange);
+  color: white;
+  padding: 12px 18px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 700;
+}
+.cart-button { white-space: nowrap; }
+.hero {
+  margin: 28px 7%;
+  padding: 48px;
+  border-radius: 24px;
+  background: var(--cream);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.hero h1 { font-size: clamp(32px, 5vw, 54px); margin: 0 0 14px; }
+.hero h1 span { color: var(--orange); }
+.hero p { color: var(--muted); line-height: 1.7; max-width: 480px; }
+.hero img { width: 38%; max-width: 350px; border-radius: 50%; aspect-ratio: 1; object-fit: cover; }
+main { padding: 8px 7% 60px; }
+.section-heading { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+.section-heading h2 { margin-bottom: 8px; }
+#search {
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  width: min(100%, 280px);
+  font-size: 15px;
+}
+.categories { display: flex; gap: 10px; flex-wrap: wrap; margin: 22px 0; }
+.category {
+  border: 1px solid #eee;
+  background: white;
+  padding: 10px 16px;
+  border-radius: 24px;
+  cursor: pointer;
+}
+.category.active { background: var(--dark); color: white; }
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
+.food-card {
+  border: 1px solid #eee;
+  border-radius: 18px;
+  overflow: hidden;
+  background: white;
+  transition: transform .2s, box-shadow .2s;
+}
+.food-card:hover { transform: translateY(-4px); box-shadow: 0 10px 28px #0000000d; }
+.food-card img { width: 100%; height: 200px; object-fit: cover; background: #f5f5f5; }
+.food-info { padding: 17px; }
+.food-top { display: flex; justify-content: space-between; gap: 10px; align-items: start; }
+.food-top h3 { margin: 0 0 7px; font-size: 18px; }
+.price { color: var(--orange); font-size: 19px; font-weight: 800; white-space: nowrap; }
+.food-info p { color: var(--muted); font-size: 14px; margin: 8px 0 14px; }
+.food-bottom { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.status { font-size: 12px; color: var(--green); font-weight: 700; }
+.status.unavailable { color: #c0392b; }
+.add-button {
+  border: 1px solid var(--orange);
+  color: var(--orange);
+  background: white;
+  border-radius: 9px;
+  padding: 9px 13px;
+  cursor: pointer;
+  font-weight: 700;
+}
+.add-button:hover { background: var(--orange); color: white; }
+.add-button:disabled { opacity: .45; cursor: not-allowed; }
+#message { color: var(--muted); padding: 20px 0; }
+#cart-panel {
+  display: none;
+  position: fixed;
+  right: 18px;
+  top: 85px;
+  width: min(390px, calc(100vw - 36px));
+  max-height: 75vh;
+  overflow: auto;
+  padding: 22px;
+  background: white;
+  border: 1px solid #eee;
+  border-radius: 18px;
+  box-shadow: 0 12px 50px #0002;
+  z-index: 10;
+}
+#cart-panel.open { display: block; }
+.cart-line { display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid #eee; }
+.quantity { display: flex; align-items: center; gap: 9px; margin-top: 7px; }
+.quantity button { border: 1px solid #ddd; background: white; border-radius: 6px; padding: 3px 9px; cursor: pointer; }
+.total { display: flex; justify-content: space-between; font-size: 19px; font-weight: 800; margin: 18px 0; }
+footer { padding: 26px 7%; text-align: center; background: var(--cream); color: var(--muted); }
+@media (max-width: 850px) {
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hero { padding: 30px; }
+  .hero img { width: 35%; }
+}
+@media (max-width: 560px) {
+  header { padding: 15px 5%; }
+  .logo { font-size: 21px; }
+  .hero { margin: 20px 5%; padding: 24px; }
+  .hero img { display: none; }
+  main { padding: 8px 5% 40px; }
+  .grid { grid-template-columns: 1fr; }
+  .food-card img { height: 220px; }
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Tasty<span>Trolley</span> 🛒</div>
+  <button class="cart-button" id="cart-toggle">🛍 Cart (<span id="cart-count">0</span>)</button>
+</header>
+
+<section class="hero">
+  <div>
+    <p>FRESHLY PREPARED · MADE WITH LOVE</p>
+    <h1>Good food.<br><span>Happy mood.</span></h1>
+    <p>Your cravings called. Discover tasty favourites, explore the menu and add something delicious to your trolley.</p>
+    <button class="primary" onclick="document.getElementById('menu').scrollIntoView({behavior:'smooth'})">Explore the menu ↓</button>
+  </div>
+  <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=700&q=85" alt="Delicious burger">
+</section>
+
+<main id="menu">
+  <div class="section-heading">
+    <div>
+      <h2>Today's delicious picks 🍽️</h2>
+      <div id="menu-subtitle">Loading our menu...</div>
+    </div>
+    <input id="search" type="search" placeholder="Search food...">
+  </div>
+  <div class="categories" id="categories"></div>
+  <div id="message" role="status">Connecting to the TastyTrolley menu...</div>
+  <div class="grid" id="food-grid"></div>
+</main>
+
+<aside id="cart-panel" aria-label="Shopping cart">
+  <div class="section-heading">
+    <h2>Your trolley</h2>
+    <button class="category" id="cart-close">Close ✕</button>
+  </div>
+  <div id="cart-items"></div>
+  <div class="total"><span>Total</span><span id="cart-total">₹0</span></div>
+  <button class="primary" style="width:100%" id="checkout">Continue to checkout</button>
+  <p style="font-size:12px;color:#777">Demo only: checkout is not connected to order processing yet.</p>
+</aside>
+
+<footer>Made with ❤️ by TastyTrolley · Good food, delivered with a smile.</footer>
+
+<script>
+const imageByName = {
+  "Veg Burger": "photo-1568901346375-23c9450c58cd",
+  "Paneer Wrap": "photo-1626700051175-6818013e1d4f",
+  "Margherita Pizza": "photo-1574071318508-1cdbab80d002",
+  "French Fries": "photo-1573080496219-bb080dd4f877",
+  "Chocolate Brownie": "photo-1606313564200-e75d5e30476c"
+};
+
+const descriptionByName = {
+  "Veg Burger": "A juicy veggie favourite with fresh, tasty toppings.",
+  "Paneer Wrap": "Soft wrap filled with delicious paneer and spices.",
+  "Margherita Pizza": "Classic pizza with tomato, mozzarella and basil.",
+  "French Fries": "Golden, crispy fries for the perfect side.",
+  "Chocolate Brownie": "A rich chocolate treat for your sweet cravings."
+};
+
+const grid = document.getElementById("food-grid");
+const message = document.getElementById("message");
+const search = document.getElementById("search");
+const categoriesEl = document.getElementById("categories");
+const cartPanel = document.getElementById("cart-panel");
+let menuItems = [];
+let activeCategory = "All";
+let cart = {};
+
+const money = value => "₹" + Number(value).toFixed(0);
+
+function imageUrl(item) {
+  const id = imageByName[item.name];
+  return id
+    ? `https://images.unsplash.com/${id}?auto=format&fit=crop&w=700&q=80`
+    : "https://images.unsplash.com/photo-1546549032-9571cd6b27df?auto=format&fit=crop&w=700&q=80";
+}
+
+async function loadMenu() {
+  try {
+    const response = await fetch("/api/menu");
+    if (!response.ok) throw new Error("HTTP " + response.status);
+    menuItems = await response.json();
+    message.textContent = "";
+    document.getElementById("menu-subtitle").textContent =
+      `${menuItems.length} tasty choices, made for you`;
+    renderCategories();
+    renderMenu();
+  } catch (error) {
+    message.textContent = "We couldn't load the menu. Please refresh the page and try again.";
+    document.getElementById("menu-subtitle").textContent = "Menu temporarily unavailable";
+    console.error("Menu loading failed:", error);
+  }
+}
+
+function renderCategories() {
+  const names = ["All", ...new Set(menuItems.map(item => item.category))];
+  categoriesEl.innerHTML = names.map(name =>
+    `<button class="category ${name === activeCategory ? "active" : ""}"
+      data-category="${escapeHtml(name)}">${escapeHtml(name)}</button>`
+  ).join("");
+}
+
+function renderMenu() {
+  const term = search.value.trim().toLowerCase();
+  const filtered = menuItems.filter(item =>
+    (activeCategory === "All" || item.category === activeCategory) &&
+    item.name.toLowerCase().includes(term)
+  );
+
+  grid.innerHTML = filtered.map(item => `
+    <article class="food-card">
+      <img src="${imageUrl(item)}" alt="${escapeHtml(item.name)}"
+        loading="lazy" onerror="this.style.visibility='hidden'">
+      <div class="food-info">
+        <div class="food-top">
+          <div>
+            <h3>${escapeHtml(item.name)}</h3>
+            <span style="font-size:12px;color:#777">${escapeHtml(item.category)}</span>
+          </div>
+          <span class="price">${money(item.price)}</span>
+        </div>
+        <p>${descriptionByName[item.name] || "A delicious TastyTrolley favourite."}</p>
+        <div class="food-bottom">
+          <span class="status ${item.available ? "" : "unavailable"}">
+            ${item.available ? "● Available" : "● Currently unavailable"}
+          </span>
+          <button class="add-button" data-add="${item.id}" ${item.available ? "" : "disabled"}>
+            + Add
+          </button>
+        </div>
+      </div>
+    </article>
+  `).join("");
+
+  if (filtered.length === 0) {
+    message.textContent = "No matching food found. Try another search or category.";
+  } else {
+    message.textContent = "";
+  }
+}
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, char => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;",
+    '"': "&quot;", "'": "&#39;"
+  })[char]);
+}
+
+function renderCart() {
+  const entries = Object.values(cart);
+  const count = entries.reduce((sum, item) => sum + item.quantity, 0);
+  const total = entries.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  document.getElementById("cart-count").textContent = count;
+  document.getElementById("cart-total").textContent = money(total);
+  document.getElementById("cart-items").innerHTML = entries.length
+    ? entries.map(item => `
+      <div class="cart-line">
+        <div>
+          <strong>${escapeHtml(item.name)}</strong><br>
+          <span style="color:#777">${money(item.price)} each</span>
+          <div class="quantity">
+            <button data-minus="${item.id}" aria-label="Remove one">−</button>
+            <span>${item.quantity}</span>
+            <button data-plus="${item.id}" aria-label="Add one">+</button>
+          </div>
+        </div>
+        <strong>${money(item.price * item.quantity)}</strong>
+      </div>
+    `).join("")
+    : "<p>Your trolley is empty. Add something delicious!</p>";
+}
+
+grid.addEventListener("click", event => {
+  const button = event.target.closest("[data-add]");
+  if (!button) return;
+  const item = menuItems.find(entry => String(entry.id) === button.dataset.add);
+  if (!item || !item.available) return;
+
+  if (!cart[item.id]) cart[item.id] = {
+    id: item.id, name: item.name, price: Number(item.price), quantity: 0
+  };
+  cart[item.id].quantity++;
+  renderCart();
+  cartPanel.classList.add("open");
+});
+
+categoriesEl.addEventListener("click", event => {
+  const button = event.target.closest("[data-category]");
+  if (!button) return;
+  activeCategory = button.dataset.category;
+  renderCategories();
+  renderMenu();
+});
+
+search.addEventListener("input", renderMenu);
+
+document.getElementById("cart-toggle").addEventListener("click", () =>
+  cartPanel.classList.toggle("open")
+);
+document.getElementById("cart-close").addEventListener("click", () =>
+  cartPanel.classList.remove("open")
+);
+
+document.getElementById("cart-items").addEventListener("click", event => {
+  const plus = event.target.closest("[data-plus]");
+  const minus = event.target.closest("[data-minus]");
+  if (plus && cart[plus.dataset.plus]) cart[plus.dataset.plus].quantity++;
+  if (minus && cart[minus.dataset.minus]) {
+    cart[minus.dataset.minus].quantity--;
+    if (cart[minus.dataset.minus].quantity <= 0) delete cart[minus.dataset.minus];
+  }
+  renderCart();
+});
+
+document.getElementById("checkout").addEventListener("click", () => {
+  alert("Your cart works! Next, we'll connect checkout to the TastyTrolley order API.");
+});
+
+renderCart();
+loadMenu();
+</script>
+</body>
+</html>
+
