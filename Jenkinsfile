@@ -1,5 +1,11 @@
+
 pipeline {
     agent any
+
+    environment {
+        IMAGE_NAME = 'divyachalla05/tastytrolley'
+        IMAGE_TAG = '4.0'
+    }
 
     stages {
         stage('Checkout') {
@@ -17,8 +23,28 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -f Dockerfile.alpine -t divyachalla05/tastytrolley:4.0 .'
+                sh 'docker build -f Dockerfile.alpine -t $IMAGE_NAME:$IMAGE_TAG .'
+            }
+        }
+
+        stage('Push to Docker Hub') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DOCKERHUB_USER',
+                    passwordVariable: 'DOCKERHUB_TOKEN'
+                )]) {
+                    sh '''
+                        set +x
+                        echo "$DOCKERHUB_TOKEN" | docker login \
+                            --username "$DOCKERHUB_USER" \
+                            --password-stdin
+                        docker push "$IMAGE_NAME:$IMAGE_TAG"
+                        docker logout
+                    '''
+                }
             }
         }
     }
 }
+
